@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.31)
+project(matrices)
+
+set(CMAKE_CXX_STANDARD 20)
+
+enable_testing()
+
+add_subdirectory(googletest)
+add_subdirectory(tests)
+
+add_library(matrices INTERFACE)
+target_include_directories(matrices INTERFACE public_include)
