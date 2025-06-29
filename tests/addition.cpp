@@ -75,7 +75,7 @@ TEST(MatrixTests, Scalar)
                 }
     };
     EXPECT_EQ(m1 * 2, m2);
-    // EXPECT_EQ(2 * m1, m2);
+    EXPECT_EQ(2 * m1, m2);
 }
 
 int main(int argc, char** argv)

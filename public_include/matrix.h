@@ -122,6 +122,19 @@ public:
         return {array};
     }
 
+    friend constexpr Matrix operator*(T scalar, Matrix matrix)
+    {
+        std::array<std::array<T, M>, N> array;
+        for (uint32_t m = 0; m < M; m++)
+        {
+            for (uint32_t n = 0; n < N; n++)
+            {
+                array[n][m] = matrix.m_matrix[n][m] * scalar;
+            }
+        }
+        return {array};
+    }
+
 private:
     std::array<std::array<T, M>, N> m_matrix;
 };
