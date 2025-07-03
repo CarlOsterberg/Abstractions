@@ -1,8 +1,7 @@
-# tests/CMakeLists.txt
 
-add_executable(matrix_addition addition.cpp)
+add_executable(matrix_tests matrix_tests.cpp)
 
-target_link_libraries(matrix_addition
+target_link_libraries(matrix_tests
         PRIVATE
         gtest
         gtest_main
@@ -10,4 +9,4 @@ target_link_libraries(matrix_addition
 )
 
 include(GoogleTest)
-gtest_discover_tests(matrix_addition)
+gtest_discover_tests(matrix_tests)

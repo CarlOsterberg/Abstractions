@@ -1,3 +1,8 @@
+/**
+ * @file matrix.h
+ * @brief Implementation of a mathematical matrix and its operations.
+ */
+
 #ifndef MATRICES_LIBRARY_H
 #define MATRICES_LIBRARY_H
 
@@ -7,22 +12,32 @@
 #include <iostream>
 #include <type_traits>
 
+/**
+ * @class Matrix
+ * @brief MxN matrix implementation for arithmetic c++ types.
+ */
 template <typename T>
 concept Number = std::is_arithmetic_v<T>;
 template <Number T, uint32_t M, uint32_t N>
 class Matrix
 {
-    static_assert(std::is_arithmetic_v<T>);
-
 public:
-    Matrix() : m_matrix(std::array<std::array<T, M>, N>{})
+    /**
+    * @brief Empty matrix constructor.
+    */
+    Matrix() : m_matrix(std::array<std::array<T, N>, M>{})
     {
     }
-
-    Matrix(std::array<std::array<T, M>, N> a_matrix) : m_matrix(a_matrix)
+    /**
+    * @brief Predefined matrix constructor.
+    * @param a_matrix Array to construct a matrix out of.
+    */
+    Matrix(std::array<std::array<T, N>, M> a_matrix) : m_matrix(a_matrix) // NOLINT
     {
     }
-
+    /**
+    * @brief Print a formatted string of the matrix.
+    */
     void print()
     {
         std::stringstream ss;
@@ -39,7 +54,7 @@ public:
                 {
                     ss << '\t';
                 }
-                ss << std::to_string(m_matrix[n][m]);
+                ss << std::to_string(m_matrix[m][n]);
                 if (n == N - 1)
                 {
                     ss << '|';
@@ -49,14 +64,18 @@ public:
         }
         std::cout << ss.str();
     }
-
-    constexpr bool operator==(const Matrix& rhs) const
+    /**
+    * @brief Boolean equals implementation for a matrix.
+    * @param a_rhs other matrix to compare.
+    * @returns true if all elements at the same indexes match.
+    */
+    constexpr bool operator==(const Matrix& a_rhs) const
     {
         for (uint32_t m = 0; m < M; m++)
         {
             for (uint32_t n = 0; n < N; n++)
             {
-                if (m_matrix[n][m] != rhs.m_matrix[n][m])
+                if (m_matrix[m][n] != a_rhs.m_matrix[m][n])
                 {
                     return false;
                 }
@@ -64,79 +83,110 @@ public:
         }
         return true;
     }
-
-    constexpr bool operator!=(const Matrix& rhs) const
+    /**
+    * @brief Boolean not equals implementation for a matrix.
+    * @param a_rhs other matrix to compare.
+    * @returns true if any element at the same indexes doesn't match.
+    */
+    constexpr bool operator!=(const Matrix& a_rhs) const
     {
-        return not (*this == rhs);
+        return not (*this == a_rhs);
     }
-
-    constexpr Matrix operator+(const Matrix& rhs) const
-    {
-        Matrix matrix;
-        for (uint32_t m = 0; m < M; m++)
-        {
-            for (uint32_t n = 0; n < N; n++)
-            {
-                matrix.m_matrix[n][m] = m_matrix[n][m] + rhs.m_matrix[n][m];
-            }
-        }
-        return std::move(matrix);
-    }
-
-    constexpr Matrix operator-(const Matrix& rhs) const
+    /**
+    * @brief Matrix addition implementation.
+    * @param a_rhs other matrix to add.
+    * @returns a matrix where each index has the values added together.
+    */
+    constexpr Matrix operator+(const Matrix& a_rhs) const
     {
         Matrix matrix;
         for (uint32_t m = 0; m < M; m++)
         {
             for (uint32_t n = 0; n < N; n++)
             {
-                matrix.m_matrix[n][m] = m_matrix[n][m] - rhs.m_matrix[n][m];
+                matrix.m_matrix[m][n] = m_matrix[m][n] + a_rhs.m_matrix[m][n];
             }
         }
         return std::move(matrix);
     }
-
+    /**
+    * @brief Matrix subtraction implementation.
+    * @param a_rhs other matrix to subtract.
+    * @returns a matrix where each index has rhs subtracted from rhs.
+    */
+    constexpr Matrix operator-(const Matrix& a_rhs) const
+    {
+        Matrix matrix;
+        for (uint32_t m = 0; m < M; m++)
+        {
+            for (uint32_t n = 0; n < N; n++)
+            {
+                matrix.m_matrix[m][n] = m_matrix[m][n] - a_rhs.m_matrix[m][n];
+            }
+        }
+        return std::move(matrix);
+    }
+    /**
+    * @brief Matrix transpose implementation.
+    * @returns a transposed matrix where the dimensions have been swapped from MxN to NxM.
+    */
     constexpr Matrix<T, N, M> transpose() const
     {
-        std::array<std::array<T, N>, M> array;
+        std::array<std::array<T, M>, N> array{};
         for (uint32_t m = 0; m < M; m++)
         {
             for (uint32_t n = 0; n < N; n++)
             {
-                array[m][n] = m_matrix[n][m];
+                array[n][m] = m_matrix[m][n];
             }
         }
         return {array};
     }
-
-    constexpr Matrix operator*(T scalar) const
+    constexpr Matrix operator*(T a_scalar) const
     {
-        std::array<std::array<T, M>, N> array;
+        std::array<std::array<T, N>, M> array{};
         for (uint32_t m = 0; m < M; m++)
         {
             for (uint32_t n = 0; n < N; n++)
             {
-                array[n][m] = m_matrix[n][m] * scalar;
+                array[m][n] = m_matrix[m][n] * a_scalar;
             }
         }
         return {array};
     }
 
-    friend constexpr Matrix operator*(T scalar, Matrix matrix)
+    friend constexpr Matrix operator*(T a_scalar, Matrix a_matrix)
     {
-        std::array<std::array<T, M>, N> array;
+        std::array<std::array<T, N>, M> array{};
         for (uint32_t m = 0; m < M; m++)
         {
             for (uint32_t n = 0; n < N; n++)
             {
-                array[n][m] = matrix.m_matrix[n][m] * scalar;
+                array[m][n] = a_matrix.m_matrix[m][n] * a_scalar;
             }
         }
         return {array};
     }
 
-private:
-    std::array<std::array<T, M>, N> m_matrix;
+    template <uint32_t P>
+    constexpr Matrix<T, M, P> operator*(Matrix<T, N, P> a_rhx) const
+    {
+        std::array<std::array<T, P>, M> array{};
+        for (uint32_t m = 0; m < M; m++)
+        {
+            for (uint32_t p = 0; p < P; p++)
+            {
+                for (uint32_t n = 0; n < N; n++)
+                {
+                    array[m][p] += m_matrix[m][n] * a_rhx.m_matrix[n][p];
+                }
+            }
+        }
+
+        return {array};
+    }
+
+    std::array<std::array<T, N>, M> m_matrix{};
 };
 
 #endif //MATRICES_LIBRARY_H
