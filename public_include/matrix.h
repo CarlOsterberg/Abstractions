@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 #include <type_traits>
 
 /**
