@@ -18,6 +18,7 @@
  */
 template <typename T>
 concept Number = std::is_arithmetic_v<T>;
+
 template <Number T, uint32_t M, uint32_t N>
 class Matrix
 {
@@ -28,6 +29,7 @@ public:
     Matrix() : m_matrix(std::array<std::array<T, N>, M>{})
     {
     }
+
     /**
     * @brief Predefined matrix constructor.
     * @param a_matrix Array to construct a matrix out of.
@@ -35,6 +37,7 @@ public:
     Matrix(std::array<std::array<T, N>, M> a_matrix) : m_matrix(a_matrix) // NOLINT
     {
     }
+
     /**
     * @brief Print a formatted string of the matrix.
     */
@@ -64,6 +67,7 @@ public:
         }
         std::cout << ss.str();
     }
+
     /**
     * @brief Boolean equals implementation for a matrix.
     * @param a_rhs other matrix to compare.
@@ -83,6 +87,7 @@ public:
         }
         return true;
     }
+
     /**
     * @brief Boolean not equals implementation for a matrix.
     * @param a_rhs other matrix to compare.
@@ -90,8 +95,9 @@ public:
     */
     constexpr bool operator!=(const Matrix& a_rhs) const
     {
-        return not (*this == a_rhs);
+        return not(*this == a_rhs);
     }
+
     /**
     * @brief Matrix addition implementation.
     * @param a_rhs other matrix to add.
@@ -109,6 +115,7 @@ public:
         }
         return std::move(matrix);
     }
+
     /**
     * @brief Matrix subtraction implementation.
     * @param a_rhs other matrix to subtract.
@@ -126,6 +133,7 @@ public:
         }
         return std::move(matrix);
     }
+
     /**
     * @brief Matrix transpose implementation.
     * @returns a transposed matrix where the dimensions have been swapped from MxN to NxM.
@@ -142,6 +150,7 @@ public:
         }
         return {array};
     }
+
     constexpr Matrix operator*(T a_scalar) const
     {
         std::array<std::array<T, N>, M> array{};
@@ -184,6 +193,84 @@ public:
         }
 
         return {array};
+    }
+
+    constexpr Matrix<T, M - 1, N> deleteRow(uint32_t a_idx)
+    {
+        if (a_idx >= M)
+        {
+            throw std::invalid_argument("a_idx has to be less then matrix dimension M");
+        }
+        std::array<std::array<T, N>, M - 1> array{};
+        uint32_t idxCorrection{0};
+        for (uint32_t m = 0; m < M; m++)
+        {
+            if (a_idx == m)
+            {
+                idxCorrection = 1;
+                continue;
+            }
+            for (uint32_t n = 0; n < N; n++)
+            {
+                array[m - idxCorrection][n] = m_matrix[m][n];
+            }
+        }
+        return {array};
+    }
+
+    constexpr Matrix<T, M, N - 1> deleteColumn(uint32_t a_idx)
+    {
+        if (a_idx >= N)
+        {
+            throw std::invalid_argument("a_idx has to be less then matrix dimension N");
+        }
+        std::array<std::array<T, N - 1>, M> array{};
+        uint32_t idxCorrection{0};
+        for (uint32_t n = 0; n < N; n++)
+        {
+            if (a_idx == n)
+            {
+                idxCorrection = 1;
+                continue;
+            }
+            for (uint32_t m = 0; m < M; m++)
+            {
+                array[m][n - idxCorrection] = m_matrix[m][n];
+            }
+        }
+        return {array};
+    }
+
+    constexpr T det() const
+    {
+        static_assert(M == N);
+        static_assert(M >= 2);
+        if constexpr (M == 2)
+        {
+            return m_matrix[0][0] * m_matrix[1][1] - m_matrix[1][0] * m_matrix[0][1];
+        }
+        else
+        {
+            T value{0};
+            for (uint32_t n = 0; n < N; n++)
+            {
+                Matrix matrix = *this;
+                value += sign(n) * m_matrix[0][n] * matrix.deleteRow(0).deleteColumn(n).det();
+            }
+            return value;
+        }
+    }
+
+    static constexpr uint32_t sign(uint32_t a_value)
+    {
+        if (a_value % 2 == 0)
+        {
+            return 1;
+        }
+        else
+        {
+            return -1;
+        }
     }
 
     std::array<std::array<T, N>, M> m_matrix{};

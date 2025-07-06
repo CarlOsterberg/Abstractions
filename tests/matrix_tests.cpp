@@ -14,11 +14,11 @@ TEST(MatrixTests, Addition)
 
 TEST(MatrixTests, Subtraction)
 {
-    typedef Matrix<int32_t, 1, 2> MatrixFloat1x2;
-    MatrixFloat1x2 m1{{11, 0}};
-    MatrixFloat1x2 m2{{2, 3}};
-    MatrixFloat1x2 m3{m1 - m2};
-    MatrixFloat1x2 m4{{9, -3}};
+    typedef Matrix<int32_t, 1, 2> Matrix1x2;
+    Matrix1x2 m1{{11, 0}};
+    Matrix1x2 m2{{2, 3}};
+    Matrix1x2 m3{m1 - m2};
+    Matrix1x2 m4{{9, -3}};
     EXPECT_EQ(m4, m3);
 }
 
@@ -167,6 +167,105 @@ TEST(MatrixTests, Multiplication)
     EXPECT_NE(D*C, E);
     EXPECT_EQ(D*C, F);
     EXPECT_NE(C*D, F);
+}
+
+TEST(MatrixTests, DeleteRow)
+{
+    typedef Matrix<uint32_t, 2, 2> Matrix2x2;
+    typedef Matrix<uint32_t, 1, 2> Matrix1x2;
+    Matrix2x2 M1{
+        {
+            {
+                {3, 4},
+                {5, 6},
+            }
+        }
+    };
+    Matrix1x2 M2{
+        {
+            {
+                {3, 4},
+            }
+        }
+    };
+    Matrix1x2 M3{
+        {
+            {
+                {5, 6},
+            }
+        }
+    };
+    EXPECT_EQ(M1.deleteRow(1), M2);
+    EXPECT_EQ(M1.deleteRow(0), M3);
+}
+
+TEST(MatrixTests, DeleteColumn)
+{
+    typedef Matrix<uint32_t, 2, 2> Matrix2x2;
+    typedef Matrix<uint32_t, 2, 1> Matrix2x1;
+    Matrix2x2 M1{
+        {
+            {
+                {3, 4},
+                {5, 6},
+            }
+        }
+    };
+    Matrix2x1 M2{
+        {
+            {
+                {3},
+                {5},
+            }
+        }
+    };
+    Matrix2x1 M3{
+        {
+            {
+                {4},
+                {6},
+            }
+        }
+    };
+    EXPECT_EQ(M1.deleteColumn(1), M2);
+    EXPECT_EQ(M1.deleteColumn(0), M3);
+}
+
+TEST(MatrixTests, Determinant)
+{
+    typedef Matrix<int32_t, 2, 2> Matrix2x2;
+    typedef Matrix<int32_t, 3, 3> Matrix3x3;
+    typedef Matrix<int32_t, 4, 4> Matrix4x4;
+    Matrix2x2 M{
+        {
+            {
+                {3, 4},
+                {5, 6},
+            }
+        }
+    };
+    EXPECT_EQ(M.det(), 3*6 - 5*4);
+    Matrix3x3 M1{
+        {
+            {
+                {5, 3, 8},
+                {1, 15, 77},
+                {8, 9, 11},
+            }
+        }
+    };
+    EXPECT_EQ(M1.det(), -1713);
+    Matrix4x4 M2{
+        {
+            {
+                {66, 13, 8, 45},
+                {45, 12, 678, 33},
+                {675, 123, 666, 99},
+                {1010, 90, 67, 1},
+            }
+        }
+    };
+    EXPECT_EQ(M2.det(), 1'365'434'865);
 }
 
 int main(int argc, char** argv)
